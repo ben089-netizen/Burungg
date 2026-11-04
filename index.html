@@ -2,27 +2,30 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rawatan Burung Pro - Pengingat & Checklist Custom</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Rawatan Burung Pro</title>
   
   <!-- Link Manifest PWA -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#1b4332">
+  <meta name="theme-color" content="#121824">
+  
+  <!-- FontAwesome untuk Ikon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
     :root {
-      --bg: #121824;
-      --card-bg: #1e2738;
-      --card-border: #2d3b52;
-      --primary: #2e7d32;
-      --primary-accent: #4caf50;
-      --active-bg: #1b382b;
-      --active-border: #81c784;
-      --text: #f0f4f8;
-      --muted: #8a99ad;
-      --warning: #ff9800;
-      --danger: #ef5350;
-      --info: #0288d1;
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --primary: #10b981;
+      --primary-hover: #059669;
+      --active-bg: #064e3b;
+      --active-border: #34d399;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -43,322 +46,530 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      padding-bottom: 30px;
     }
 
+    /* Header & Clock */
     .header-card {
-      background: linear-gradient(135deg, #1b4332 0%, #081c15 100%);
-      border: 1px solid var(--primary-accent);
+      background: linear-gradient(135deg, #0f766e 0%, #064e3b 100%);
+      border: 1px solid var(--active-border);
       border-radius: 16px;
-      padding: 16px;
+      padding: 20px 16px;
       text-align: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
+      position: relative;
     }
 
-    .date-display { font-size: 0.9rem; color: #a3e635; font-weight: 700; text-transform: uppercase; }
-    .clock-display { font-size: 2.4rem; font-weight: 800; letter-spacing: 1px; margin: 4px 0; color: #ffffff; }
-    .day-status { font-size: 0.85rem; color: #e2e8f0; margin-top: 4px; }
+    .wake-lock-status {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      font-size: 0.7rem;
+      background: rgba(0,0,0,0.3);
+      padding: 4px 8px;
+      border-radius: 12px;
+      color: #a7f3d0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .date-display { font-size: 0.9rem; color: #a7f3d0; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;}
+    .clock-display { 
+      font-size: 3rem; 
+      font-weight: 800; 
+      letter-spacing: 2px; 
+      margin: 8px 0; 
+      color: #ffffff;
+      text-shadow: 0 0 15px rgba(255,255,255,0.4);
+    }
+    .day-status { font-size: 0.85rem; color: #e2e8f0; margin-top: 4px; font-weight: 500; }
+
+    /* Controls */
+    .bird-selector { margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .bird-selector select {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border: 1px solid #6ee7b7;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      outline: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .bird-selector select option { background: var(--card-bg); color: #fff; }
 
     #btnStopAlarm {
       display: none;
       width: 100%;
-      padding: 14px;
-      background: #e53935;
+      padding: 16px;
+      background: var(--danger);
       color: white;
       font-weight: 800;
       border: none;
       border-radius: 12px;
-      font-size: 1rem;
+      font-size: 1.1rem;
       cursor: pointer;
-      box-shadow: 0 0 18px rgba(229, 57, 53, 0.8);
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
       animation: pulse 1s infinite alternate;
+      text-transform: uppercase;
     }
 
     @keyframes pulse {
-      0% { transform: scale(0.98); opacity: 0.9; }
-      100% { transform: scale(1.02); opacity: 1; }
+      0% { transform: scale(0.98); box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); }
+      100% { transform: scale(1.02); box-shadow: 0 0 25px rgba(239, 68, 68, 0.8); }
     }
 
     .control-btn-group { display: flex; gap: 8px; }
-
     .btn {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 0.85rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: opacity 0.2s;
+      flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: 600;
+      font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.2s;
     }
-
-    .btn:active { opacity: 0.8; }
-    .btn-primary { background: var(--primary-accent); color: #fff; }
+    .btn:active { transform: translateY(2px); }
+    .btn-primary { background: var(--primary); color: #fff; }
     .btn-warning { background: var(--warning); color: #111; }
-    .btn-secondary { background: #334155; color: #fff; }
-    .btn:disabled { background: #475569; cursor: default; }
+    .btn-secondary { background: var(--card-border); color: #fff; }
 
+    /* Tabs Segmented Control */
     .nav-tabs {
-      display: flex;
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 4px;
-      border: 1px solid var(--card-border);
+      display: flex; background: #0f172a; border-radius: 12px; padding: 4px;
+      border: 1px solid var(--card-border); box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
     }
-
     .tab-btn {
-      flex: 1;
-      padding: 8px;
-      text-align: center;
-      background: transparent;
-      border: none;
-      color: var(--muted);
-      font-size: 0.8rem;
-      font-weight: 700;
-      border-radius: 8px;
-      cursor: pointer;
+      flex: 1; padding: 10px 4px; text-align: center; background: transparent; border: none;
+      color: var(--muted); font-size: 0.75rem; font-weight: 700; border-radius: 8px; cursor: pointer;
+      transition: all 0.3s;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
     }
-
-    .tab-btn.active { background: var(--primary); color: #fff; }
-    .tab-content { display: none; }
+    .tab-btn i { font-size: 1.1rem; }
+    .tab-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    
+    .tab-content { display: none; animation: fadeInUp 0.4s ease forwards; }
     .tab-content.active { display: block; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+    /* Cards */
     .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 8px;
-      transition: all 0.3s ease;
+      background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px;
+      padding: 16px; margin-bottom: 10px; transition: all 0.3s ease;
     }
-
     .card.active-schedule {
-      background: var(--active-bg);
-      border-color: var(--active-border);
-      box-shadow: 0 0 12px rgba(76, 175, 80, 0.3);
+      background: var(--active-bg); border-color: var(--active-border);
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); transform: scale(1.01);
     }
-
-    .card.disabled-card {
-      opacity: 0.5;
-      border-color: #334155;
-      background: #161e2e;
-    }
-
-    .card-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-
+    
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+    .card-title { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 8px;}
     .badge {
-      font-size: 0.72rem;
-      padding: 3px 8px;
-      border-radius: 10px;
-      background: #334155;
-      color: var(--muted);
-      font-weight: 600;
+      font-size: 0.75rem; padding: 4px 10px; border-radius: 12px;
+      background: var(--card-border); color: var(--text); font-weight: 700; white-space: nowrap;
     }
+    .card.active-schedule .badge { background: var(--primary); color: #fff; }
+    .card-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+    
+    /* Warna Khusus Judul Kartu */
+    .text-mandi { color: var(--info); }
+    .text-krodong { color: var(--warning); }
 
-    .card.active-schedule .badge { background: var(--primary-accent); color: #fff; }
-    .badge-mandi { background: #0288d1; color: #fff; }
-    .card-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.4; }
-
+    /* Checklist */
     .check-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: rgba(255,255,255,0.03);
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      margin-top: 6px;
+      display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.03);
+      padding: 12px 14px; border-radius: 10px; font-size: 0.85rem; cursor: pointer; margin-top: 8px;
+      border: 1px solid transparent; transition: all 0.2s;
     }
+    .check-item:hover { background: rgba(255,255,255,0.06); }
+    .check-item input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); cursor: pointer; }
+    .check-item.done { text-decoration: line-through; color: var(--muted); opacity: 0.7; background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2); cursor: not-allowed; }
+    .time-stamp { margin-left: auto; font-size: 0.7rem; color: var(--primary); font-weight: bold; background: rgba(16, 185, 129, 0.1); padding: 3px 6px; border-radius: 6px; }
 
-    .check-item input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--primary-accent);
+    /* Inputs & Logs */
+    .note-input, .audio-select {
+      width: 100%; background: #0f172a; border: 1px solid var(--card-border); border-radius: 10px;
+      color: #fff; padding: 12px; font-size: 0.9rem; outline: none; margin-bottom: 10px;
     }
-
-    .check-item.done { text-decoration: line-through; color: var(--muted); }
-
-    .note-input {
-      width: 100%;
-      height: 70px;
-      background: #0f172a;
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      color: #fff;
-      padding: 8px;
-      font-size: 0.85rem;
-      resize: none;
-      margin-bottom: 8px;
-    }
-
-    .log-list {
-      max-height: 180px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .log-item {
-      background: rgba(255,255,255,0.03);
-      padding: 8px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      border-left: 3px solid var(--primary-accent);
-    }
-
-    .log-date { font-weight: bold; color: var(--primary-accent); font-size: 0.75rem; }
+    .note-input { height: 80px; resize: none; }
+    .note-input:focus { border-color: var(--primary); }
+    
+    .log-list { max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; }
+    .log-item { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 10px; font-size: 0.85rem; border-left: 4px solid var(--primary); line-height: 1.4; }
+    .log-date { font-weight: bold; color: var(--primary); font-size: 0.75rem; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
   </style>
 </head>
 <body>
 
 <div class="app-container">
   <div class="header-card">
+    <div class="wake-lock-status" id="wakeLockStatus"><i class="fas fa-sun"></i> Layar Aktif</div>
     <div class="date-display" id="dateDisplay">-- ------ ----</div>
     <div class="clock-display" id="clockDisplay">00:00:00</div>
-    <div class="day-status" id="dayStatus">Status Hari Ini: -</div>
+    <div class="day-status" id="dayStatus">Memuat Jadwal...</div>
+    
+    <div class="bird-selector">
+      <i class="fas fa-kiwi-bird" style="color:#6ee7b7"></i>
+      <select id="birdTypeSelect" onchange="changeBirdType()">
+        <option value="murai">Murai Batu</option>
+        <option value="cendet">Cendet / Pentet</option>
+      </select>
+    </div>
   </div>
 
-  <button id="btnStopAlarm" onclick="stopAlarm()">🔕 MATIKAN ALARM / GETAR (1 MIN)</button>
+  <button id="btnStopAlarm" onclick="stopAlarm()"><i class="fas fa-bell-slash"></i> MATIKAN ALARM</button>
 
   <div class="control-btn-group">
     <button class="btn btn-primary" id="btnNotif" onclick="requestNotifPermission()">
-      🔔 Aktifkan Notifikasi
+      <i class="fas fa-bell"></i> Izin Notif
     </button>
     <button class="btn btn-warning" onclick="testAlarmAndVibrate()">
-      📳 Tes Getar & Alarm
+      <i class="fas fa-vibrate"></i> Tes Alarm
     </button>
   </div>
 
   <div class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('tabJadwal')">⏱️ Timeline</button>
-    <button class="tab-btn" onclick="switchTab('tabChecklist')">☑️ Checklist</button>
-    <button class="tab-btn" onclick="switchTab('tabTerapi')">📻 Terapi Air</button>
-    <button class="tab-btn" onclick="switchTab('tabCatatan')">📝 Catatan Log</button>
+    <button class="tab-btn active" onclick="switchTab('tabJadwal', this)">
+      <i class="fas fa-stream"></i> Timeline
+    </button>
+    <button class="tab-btn" onclick="switchTab('tabChecklist', this)">
+      <i class="fas fa-check-square"></i> Checklist
+    </button>
+    <button class="tab-btn" onclick="switchTab('tabTerapi', this)">
+      <i class="fas fa-headphones"></i> Terapi
+    </button>
+    <button class="tab-btn" onclick="switchTab('tabCatatan', this)">
+      <i class="fas fa-book"></i> Catatan
+    </button>
   </div>
 
+  <!-- TAB TIMELINE -->
   <div id="tabJadwal" class="tab-content active">
     <div class="card" id="cardEmbun">
-      <div class="card-title">
-        <span>🌌 Pengembunan Subuh</span>
-        <span class="badge" id="badgeEmbun">05:00 - 05:15</span>
+      <div class="card-header">
+        <div class="card-title"><i class="fas fa-cloud-moon" style="color:#a7f3d0"></i> Pengembunan Pagi</div>
+        <div class="badge">05:00 - 05:30</div>
       </div>
-      <div class="card-desc">Keluarkan burung untuk proses pengembunan subuh di tempat terbuka.</div>
+      <div class="card-desc">Pengembunan subuh di tempat terbuka untuk melatih pernafasan dan mental.</div>
     </div>
 
     <div class="card" id="cardEFPagi">
-      <div class="card-title">
-        <span>🦗 EF Pagi (9 Jangkrik) <span id="mandiBadgeTag"></span></span>
-        <span class="badge" id="badgeEFPagi">05:15 - 05:30</span>
+      <div class="card-header">
+        <div class="card-title"><i class="fas fa-bug" style="color:#fcd34d"></i> EF Pagi & Bersih</div>
+        <div class="badge">05:30 - 06:00</div>
       </div>
-      <div class="card-desc" id="descEFPagi">Beri <strong>9 ekor jangkrik pagi</strong> & ganti air bersih.</div>
+      <div class="card-desc" id="descEFPagi">-</div>
     </div>
 
-    <div class="card" id="cardJemur">
-      <div class="card-title">
-        <span>☀️ Penjemuran Pagi</span>
-        <span class="badge" id="badgeJemur">05:30 - 06:00</span>
+    <!-- KARTU DINAMIS: MANDI ATAU KRODONG -->
+    <div class="card" id="cardMandiJemur">
+      <div class="card-header">
+        <div class="card-title" id="titleMandiJemur"><i class="fas fa-shower"></i> Jadwal Perawatan</div>
+        <div class="badge">06:00 - 15:30</div>
       </div>
-      <div class="card-desc">Jemur burung di bawah sinar matahari pagi secara bertahap.</div>
-    </div>
-
-    <div class="card" id="cardKrodongPagi">
-      <div class="card-title">
-        <span>🛡️️ Pengerodongan Pagi</span>
-        <span class="badge" id="badgeKrodongPagi">06:00 WIB</span>
-      </div>
-      <div class="card-desc" id="descKrodongPagi">Angin-anginkan sebentar lalu masukkan krodong untuk istirahat/pemasteran.</div>
+      <div class="card-desc" id="descMandiJemur">-</div>
     </div>
 
     <div class="card" id="cardEFSore">
-      <div class="card-title">
-        <span>🌇 EF Sore (9 Jangkrik) & Krodong</span>
-        <span class="badge" id="badgeEFSore">15:30 - 16:30</span>
+      <div class="card-header">
+        <div class="card-title"><i class="fas fa-cloud-sun" style="color:#fdba74"></i> EF Sore & Krodong</div>
+        <div class="badge">15:30 - 16:30</div>
       </div>
-      <div class="card-desc">Beri <strong>9 ekor jangkrik sore</strong>, bersihkan karpet sangkar, lalu krodong.</div>
+      <div class="card-desc" id="descEFSore">-</div>
     </div>
 
     <div class="card" id="cardKroto">
-      <div class="card-title">
-        <span>🥣 Kroto Mingguan (1x Seminggu)</span>
-        <span class="badge" id="badgeKroto">Mingguan</span>
+      <div class="card-header">
+        <div class="card-title"><i class="fas fa-utensils" style="color:#fca5a5"></i> Ekstra Fooding Tambahan</div>
+        <div class="badge">Mingguan</div>
       </div>
-      <div class="card-desc">Beri 1 sendok makan kroto segar sebagai tambahan gizi mingguan.</div>
-    </div>
-
-    <div class="card" id="cardMasteran">
-      <div class="card-title">
-        <span>📻 Ganti Masteran Bulanan</span>
-        <span class="badge" id="badgeMasteran">Setiap Tgl 6</span>
-      </div>
-      <div class="card-desc">Evaluasi materi isian dan ganti variasi suara masteran burung.</div>
+      <div class="card-desc" id="descKroto">-</div>
     </div>
   </div>
 
+  <!-- TAB CHECKLIST -->
   <div id="tabChecklist" class="tab-content">
     <div class="card">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-        <span style="font-weight:bold; font-size:0.95rem;">☑️ Checklist Rawatan Hari Ini</span>
-        <button class="btn btn-secondary" style="font-size:0.75rem; padding:4px 8px;" onclick="resetChecklist()">Reset Harian</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <span style="font-weight:700; font-size:1rem;"><i class="fas fa-tasks" style="color:var(--primary); margin-right:6px;"></i> Tugas Hari Ini</span>
+        <button class="btn btn-secondary" style="font-size:0.7rem; padding:6px 10px;" onclick="forceResetChecklist()"><i class="fas fa-undo"></i> Reset</button>
       </div>
       <div id="checklistGroup"></div>
     </div>
   </div>
 
+  <!-- TAB TERAPI -->
   <div id="tabTerapi" class="tab-content">
     <div class="card">
-      <div class="card-title">📻 Pemutar Terapi Gemericik Air</div>
-      <div class="card-desc" style="margin-bottom:10px;">Gunakan suara terapi air kencang untuk memancing burung bunyi.</div>
-      <select id="audioSelect" onchange="loadAudio()" style="width:100%; padding:8px; border-radius:8px; background:#0f172a; border:1px solid var(--card-border); color:#fff;">
+      <div class="card-header">
+        <div class="card-title"><i class="fas fa-water" style="color:#38bdf8"></i> Audio Terapi Alam</div>
+      </div>
+      <div class="card-desc" style="margin-bottom:15px;">Putar suara terapi air mengalir untuk merelaksasi burung dan memancing bunyi.</div>
+      <select id="audioSelect" class="audio-select" onchange="loadAudio()">
         <option value="https://www.soundjay.com/nature/sounds/river-1.mp3">🏞️ Terapi Gemericik Air Sungai</option>
-        <option value="https://www.soundjay.com/nature/sounds/rain-01.mp3">🌧️ Terapi Suara Hujan & Gemericik</option>
+        <option value="https://www.soundjay.com/nature/sounds/rain-01.mp3">🌧️ Terapi Suara Hujan Deras</option>
       </select>
-      <audio id="masteranPlayer" controls style="width:100%; margin-top:10px;"></audio>
+      <audio id="masteranPlayer" controls style="width:100%; border-radius:8px; outline:none; margin-top:8px;"></audio>
     </div>
   </div>
 
+  <!-- TAB CATATAN -->
   <div id="tabCatatan" class="tab-content">
     <div class="card">
-      <div class="card-title">📝 Tambah Catatan Rawatan / Masteran</div>
-      <textarea class="note-input" id="noteInput" placeholder="Contoh: Tanggal 6 Ganti Masteran Suara Cililin..."></textarea>
-      <button class="btn btn-primary" style="width:100%" onclick="saveNote()">Simpan Catatan</button>
+      <div class="card-header"><div class="card-title"><i class="fas fa-pen-nib" style="color:var(--primary)"></i> Tulis Catatan Manual</div></div>
+      <textarea class="note-input" id="noteInput" placeholder="Contoh: Burung terlihat lebih gacor setelah jemur..."></textarea>
+      <button class="btn btn-primary" style="width:100%" onclick="saveManualNote()"><i class="fas fa-save"></i> Simpan Catatan</button>
     </div>
 
     <div class="card">
-      <div class="card-title">📋 Riwayat Catatan</div>
+      <div class="card-header" style="margin-bottom:15px;"><div class="card-title"><i class="fas fa-history"></i> Riwayat Aktivitas & Log</div></div>
       <div class="log-list" id="logList"></div>
     </div>
   </div>
 </div>
 
 <script>
-  // Registrasi Service Worker PWA
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('PWA Service Worker terdaftar!', reg))
-        .catch(err => console.error('Gagal daftar SW:', err));
+  // ==========================================
+  // 1. WAKE LOCK API (Layar Tidak Mati)
+  // ==========================================
+  let wakeLock = null;
+  async function requestWakeLock() {
+    try {
+      if ('wakeLock' in navigator) {
+        wakeLock = await navigator.wakeLock.request('screen');
+        document.getElementById('wakeLockStatus').innerHTML = '<i class="fas fa-sun"></i> Layar Aktif';
+        document.getElementById('wakeLockStatus').style.color = '#a7f3d0';
+        
+        wakeLock.addEventListener('release', () => {
+          document.getElementById('wakeLockStatus').innerHTML = '<i class="fas fa-moon"></i> Layar Redup';
+          document.getElementById('wakeLockStatus').style.color = '#94a3b8';
+        });
+      }
+    } catch (err) {
+      console.log(`Wake Lock Error: ${err.name}, ${err.message}`);
+    }
+  }
+
+  // Minta ulang wake lock jika user pindah tab dan kembali lagi
+  document.addEventListener('visibilitychange', async () => {
+    if (wakeLock !== null && document.visibilityState === 'visible') {
+      requestWakeLock();
+    }
+  });
+
+  // ==========================================
+  // 2. PRESET DATA BURUNG
+  // ==========================================
+  const BIRD_PRESETS = {
+    murai: {
+      name: "Murai Batu",
+      descPagi: "Beri <strong>9 ekor jangkrik pagi</strong>, bersihkan alas kandang & ganti air minum.",
+      descSore: (isVitDay) => `Beri <strong>9 ekor jangkrik sore</strong> ${isVitDay ? "<br><span style='color:var(--info)'><i class='fas fa-flask'></i> + Taburkan Serbuk Vitacor ke EF</span>" : ""}<br>Bersihkan karpet sangkar, lalu krodong.`,
+      descKroto: "Beri 1 sendok makan kroto segar (seminggu sekali).",
+      checklist: (isMandi, isVitDay) => [
+        "Pengembunan Subuh",
+        "Beri EF Pagi (9 Jangkrik) & Bersih Kandang",
+        isMandi ? "Sesi Mandi Keramba Pagi" : "Pengerodongan Pagi (Tanpa Mandi)",
+        isMandi ? "Ablak / Diangin-anginkan (Buka Krodong)" : "Istirahat Full Krodong Siang",
+        isVitDay ? "Beri EF Sore (9 Jangkrik) + Vitacor" : "Beri EF Sore (9 Jangkrik)",
+        "Bersihkan Karpet Kotoran Sore",
+        "Krodong Full Malam Hari",
+        "Beri Kroto Segar (Mingguan)"
+      ]
+    },
+    cendet: {
+      name: "Cendet / Pentet",
+      descPagi: "Beri <strong>5 ekor jangkrik</strong> + <strong>1 ulat hongkong</strong>, bersihkan kandang.",
+      descSore: (isVitDay) => `Beri <strong>3 ekor jangkrik besar</strong> ${isVitDay ? "<br><span style='color:var(--info)'><i class='fas fa-flask'></i> + Taburkan Serbuk Vitacor ke EF</span>" : ""}<br>Bersihkan sangkar & krodong malam.`,
+      descKroto: "Beri kroto bersih / ulat kandang secukupnya (2x seminggu).",
+      checklist: (isMandi, isVitDay) => [
+        "Pengembunan Subuh",
+        "Beri EF Pagi (5 Jangkrik + 1 UH) & Bersih Kandang",
+        isMandi ? "Sesi Mandi Semprot Pagi" : "Pengerodongan Pagi (Tanpa Mandi)",
+        isMandi ? "Ablak / Diangin-anginkan" : "Istirahat Full Krodong Siang",
+        isVitDay ? "Beri EF Sore (3 Jangkrik) + Vitacor" : "Beri EF Sore (3 Jangkrik)",
+        "Bersihkan Kotoran & Ganti Alas Sore",
+        "Krodong Full Malam Hari",
+        "Beri Ulat Kandang/Kroto (Mingguan)"
+      ]
+    }
+  };
+
+  // Variabel tracking notifikasi pre-alarm (5 menit sebelum)
+  let preNotifEmbun = false;
+  let preNotifEFPagi = false;
+  let preNotifMandi = false;
+  let preNotifEFSore = false;
+  let vibrationTimer = null;
+
+  // ==========================================
+  // 3. FUNGSI UI & TAB
+  // ==========================================
+  function switchTab(tabId, btnElement) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btnElement.classList.add('active');
+  }
+
+  function changeBirdType() {
+    const type = document.getElementById('birdTypeSelect').value;
+    localStorage.setItem('selectedBirdProfile', type);
+    applyBirdPreset(type);
+    checkAndResetDailyData(); 
+  }
+
+  function applyBirdPreset(type) {
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    const isVitDay = (dayOfWeek === 1 || dayOfWeek === 3 || dayOfWeek === 6);
+    const isMandiDay = (dayOfWeek === 3 || dayOfWeek === 5); // Rabu & Jumat
+
+    const preset = BIRD_PRESETS[type] || BIRD_PRESETS.murai;
+    document.getElementById('descEFPagi').innerHTML = preset.descPagi;
+    document.getElementById('descEFSore').innerHTML = preset.descSore(isVitDay);
+    document.getElementById('descKroto').innerHTML = preset.descKroto;
+
+    // Logika Perubahan Judul Kartu Tengah
+    const titleEl = document.getElementById('titleMandiJemur');
+    const descEl = document.getElementById('descMandiJemur');
+    
+    if (isMandiDay) {
+      titleEl.innerHTML = `<i class="fas fa-shower"></i> Jadwal Mandi Pagi`;
+      titleEl.className = 'card-title text-mandi';
+      descEl.innerHTML = `Hari ini jadwal <strong>Mandi (${type === 'murai' ? 'Keramba' : 'Semprot'})</strong> jam 06:00, dilanjutkan dengan ablak/diangin-anginkan tanpa krodong.`;
+    } else {
+      titleEl.innerHTML = `<i class="fas fa-moon"></i> Pengerodongan`;
+      titleEl.className = 'card-title text-krodong';
+      descEl.innerHTML = `Tidak ada jadwal mandi. Setelah EF pagi, burung langsung <strong>Full Krodong</strong> untuk istirahat.`;
+    }
+  }
+
+  // ==========================================
+  // 4. CHECKLIST (AUTO-LOCK, AUTO-RESET, AUTO-LOG)
+  // ==========================================
+  function checkAndResetDailyData() {
+    const todayStr = new Date().toDateString();
+    let storedData = JSON.parse(localStorage.getItem('birdChecklistData') || '{}');
+    
+    // Jika hari sudah berganti, reset data checklist
+    if (storedData.date !== todayStr) {
+      storedData = { date: todayStr, murai: {}, cendet: {} };
+      localStorage.setItem('birdChecklistData', JSON.stringify(storedData));
+    }
+    renderChecklist(storedData);
+  }
+
+  function forceResetChecklist() {
+    if(confirm("Yakin ingin mereset semua checklist hari ini?")) {
+      const todayStr = new Date().toDateString();
+      const resetData = { date: todayStr, murai: {}, cendet: {} };
+      localStorage.setItem('birdChecklistData', JSON.stringify(resetData));
+      renderChecklist(resetData);
+    }
+  }
+
+  function renderChecklist(storedData) {
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    const isMandiDay = (dayOfWeek === 3 || dayOfWeek === 5);
+    const isVitDay = (dayOfWeek === 1 || dayOfWeek === 3 || dayOfWeek === 6);
+
+    const currentProfile = document.getElementById('birdTypeSelect').value;
+    const preset = BIRD_PRESETS[currentProfile] || BIRD_PRESETS.murai;
+    const items = preset.checklist(isMandiDay, isVitDay);
+
+    const group = document.getElementById('checklistGroup');
+    group.innerHTML = '';
+    
+    const profileStates = storedData[currentProfile] || {};
+
+    items.forEach((itemText, idx) => {
+      const state = profileStates[idx];
+      const isChecked = state ? true : false;
+      const timeStamp = state ? state.time : '';
+
+      const label = document.createElement('label');
+      label.className = `check-item ${isChecked ? 'done' : ''}`;
+      
+      // Jika sudah diceklis, disable inputnya agar tidak bisa di-uncheck
+      label.innerHTML = `
+        <input type="checkbox" ${isChecked ? 'checked disabled' : ''} onchange="handleCheckItem(${idx}, '${itemText}', this)">
+        <span>${itemText}</span>
+        ${isChecked ? `<span class="time-stamp"><i class="far fa-clock"></i> ${timeStamp}</span>` : ''}
+      `;
+      group.appendChild(label);
     });
   }
 
-  let vibrationTimer = null;
-  let notifEmbunSent = false;
-  let notifEFPagiSent = false;
-  let notifJemurSent = false;
-  let notifKrodongPagiSent = false;
-  let notifEFSoreSent = false;
-  let notifMasteranSent = false;
+  function handleCheckItem(idx, itemText, checkbox) {
+    if(!checkbox.checked) return; // Karena disabled saat checked, ini hanya jalan saat baru dicentang
+
+    const now = new Date();
+    const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    
+    // 1. Simpan State Checklist
+    let storedData = JSON.parse(localStorage.getItem('birdChecklistData') || '{}');
+    const currentProfile = document.getElementById('birdTypeSelect').value;
+    
+    if(!storedData[currentProfile]) storedData[currentProfile] = {};
+    storedData[currentProfile][idx] = { time: timeStr };
+    localStorage.setItem('birdChecklistData', JSON.stringify(storedData));
+    
+    // 2. Render ulang agar terkunci (disabled)
+    renderChecklist(storedData);
+
+    // 3. Otomatis masukan ke Catatan Log
+    autoLogActivity(`✅ Selesai: ${itemText} (${BIRD_PRESETS[currentProfile].name})`);
+  }
+
+  // ==========================================
+  // 5. CATATAN LOGGING
+  // ==========================================
+  function autoLogActivity(text) {
+    saveNoteToStorage(text, true);
+  }
+
+  function saveManualNote() {
+    const input = document.getElementById('noteInput');
+    const text = input.value.trim();
+    if (!text) return;
+    saveNoteToStorage(`📝 Catatan: ${text}`, false);
+    input.value = '';
+  }
+
+  function saveNoteToStorage(text, isAuto) {
+    const notes = JSON.parse(localStorage.getItem('birdNotesMaster') || '[]');
+    const now = new Date();
+    const dateStr = `${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    
+    notes.unshift({ date: dateStr, text: text, auto: isAuto });
+    if(notes.length > 50) notes.pop(); // Batasi 50 log terakhir
+    
+    localStorage.setItem('birdNotesMaster', JSON.stringify(notes));
+    renderNotes();
+  }
+
+  function renderNotes() {
+    const list = document.getElementById('logList');
+    const notes = JSON.parse(localStorage.getItem('birdNotesMaster') || '[]');
+    list.innerHTML = notes.length === 0 ? '<div style="text-align:center; font-size:0.85rem; color:var(--muted); padding:10px;">Belum ada riwayat aktivitas hari ini.</div>' : '';
+    
+    notes.forEach(note => {
+      const item = document.createElement('div');
+      item.className = 'log-item';
+      if(note.auto) item.style.borderLeftColor = 'var(--info)';
+      
+      const icon = note.auto ? '<i class="fas fa-check-circle" style="color:var(--info)"></i>' : '<i class="fas fa-edit" style="color:var(--primary)"></i>';
+      item.innerHTML = `<div class="log-date">${icon} ${note.date}</div><div style="color:#cbd5e1">${note.text}</div>`;
+      list.appendChild(item);
+    });
+  }
+
+  // ==========================================
+  // 6. ALARM, AUDIO & NOTIFIKASI
+  // ==========================================
+  function loadAudio() {
+    document.getElementById('masteranPlayer').src = document.getElementById('audioSelect').value;
+  }
 
   function playAlarmChime() {
     try {
@@ -377,29 +588,21 @@
         osc.start(ctx.currentTime + start);
         osc.stop(ctx.currentTime + start + duration);
       };
-      playNote(523.25, 0, 0.2);
-      playNote(659.25, 0.15, 0.2);
-      playNote(783.99, 0.3, 0.2);
-      playNote(1046.50, 0.45, 0.4);
+      playNote(523.25, 0, 0.2); playNote(659.25, 0.2, 0.2); 
+      playNote(783.99, 0.4, 0.2); playNote(1046.50, 0.6, 0.5);
     } catch (e) {}
   }
 
-  function triggerShortVibration() {
-    if ("vibrate" in navigator) navigator.vibrate([500, 200, 500, 200, 800]);
-  }
-
-  function start1MinVibration() {
+  function startVibration() {
     if (!("vibrate" in navigator)) return;
     stopAlarm();
     const startTime = Date.now();
     document.getElementById('btnStopAlarm').style.display = 'block';
+    
     vibrationTimer = setInterval(() => {
-      if (Date.now() - startTime >= 60000) {
-        stopAlarm();
-      } else {
-        navigator.vibrate([1500, 500]);
-      }
-    }, 2000);
+      if (Date.now() - startTime >= 60000) { stopAlarm(); } 
+      else { navigator.vibrate([1000, 500, 1000, 500]); }
+    }, 3000);
   }
 
   function stopAlarm() {
@@ -408,164 +611,14 @@
     document.getElementById('btnStopAlarm').style.display = 'none';
   }
 
-  function updateClockAndSchedules() {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    const day = now.getDate();
-    const dayOfWeek = now.getDay();
-    const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    const dayNames = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-
-    document.getElementById('clockDisplay').innerText = `${hours}:${minutes}:${seconds}`;
-    document.getElementById('dateDisplay').innerText = `${dayNames[dayOfWeek]}, ${day} ${monthNames[now.getMonth()]} ${now.getFullYear()}`;
-
-    const isMandiDay = (dayOfWeek === 3 || dayOfWeek === 5);
-    const dayStatusEl = document.getElementById('dayStatus');
-    if (isMandiDay) {
-      dayStatusEl.innerHTML = `💧 <strong>HARI INI JADWAL MANDI PAGI (${dayNames[dayOfWeek]})</strong>`;
-      dayStatusEl.style.color = "#38bdf8";
-    } else {
-      dayStatusEl.innerText = `Status Hari Ini: Rawatan Reguler (${dayNames[dayOfWeek]})`;
-      dayStatusEl.style.color = "#e2e8f0";
+  function sendNotif(title, body) {
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification(title, { 
+        body: body, 
+        icon: 'https://cdn-icons-png.flaticon.com/512/3069/3069172.png',
+        requireInteraction: true // Notif tetap muncul sampai di-klik/swipe
+      });
     }
-
-    const currentMins = now.getHours() * 60 + now.getMinutes();
-
-    // 1. Pengembunan (05:00)
-    const isEmbun = currentMins >= 300 && currentMins < 315;
-    toggleCard('cardEmbun', isEmbun);
-    if (isEmbun && !notifEmbunSent) {
-      sendNotif("🌌 SIAP-SIAP PENGEMBUNAN (05:00)", "Keluarkan burung untuk pengembunan subuh.");
-      start1MinVibration(); playAlarmChime(); notifEmbunSent = true;
-    } else if (!isEmbun) notifEmbunSent = false;
-
-    // 2. EF Pagi (05:15)
-    const isEFPagi = currentMins >= 315 && currentMins < 330;
-    toggleCard('cardEFPagi', isEFPagi);
-    if (isEFPagi && !notifEFPagiSent) {
-      sendNotif("BB EF Pagi (05:15)", isMandiDay ? "Beri 9 Jangkrik & MANDIKAN BURUNG!" : "Beri 9 Jangkrik Pagi.");
-      triggerShortVibration(); playAlarmChime(); notifEFPagiSent = true;
-    } else if (!isEFPagi) notifEFPagiSent = false;
-
-    // 3. Penjemuran (05:30)
-    const isJemur = currentMins >= 330 && currentMins < 360;
-    toggleCard('cardJemur', isJemur);
-    if (isJemur && !notifJemurSent) {
-      sendNotif("☀️ Penjemuran Pagi (05:30)", "Pindahkan burung ke lokasi penjemuran.");
-      triggerShortVibration(); playAlarmChime(); notifJemurSent = true;
-    } else if (!isJemur) notifJemurSent = false;
-
-    // 4. Krodong Pagi (06:00)
-    const isKrodongPagi = (currentMins >= 360 && currentMins < 375) && !isMandiDay;
-    toggleCard('cardKrodongPagi', isKrodongPagi);
-    if (isKrodongPagi && !notifKrodongPagiSent) {
-      sendNotif("🛡️ Pengerodongan Pagi (06:00)", "Krodong burung untuk pemasteran.");
-      triggerShortVibration(); playAlarmChime(); notifKrodongPagiSent = true;
-    } else if (!isKrodongPagi) notifKrodongPagiSent = false;
-
-    // 5. EF Sore (15:30)
-    const isEFSore = currentMins >= 930 && currentMins <= 990;
-    toggleCard('cardEFSore', isEFSore);
-    if (isEFSore && !notifEFSoreSent) {
-      sendNotif("🌇 EF Sore (15:30)", "Beri 9 Jangkrik sore & krodong.");
-      triggerShortVibration(); playAlarmChime(); notifEFSoreSent = true;
-    } else if (!isEFSore) notifEFSoreSent = false;
-
-    // 6. Masteran (Tgl 6)
-    const isMasteranDay = day === 6;
-    toggleCard('cardMasteran', isMasteranDay);
-    if (isMasteranDay && !notifMasteranSent) {
-      sendNotif("📻 Ganti Masteran Bulanan", "Tanggal 6: Waktunya ganti materi variasi masteran!");
-      triggerShortVibration(); playAlarmChime(); notifMasteranSent = true;
-    } else if (!isMasteranDay) notifMasteranSent = false;
-  }
-
-  function toggleCard(cardId, isActive) {
-    const card = document.getElementById(cardId);
-    if (isActive) card.classList.add('active-schedule');
-    else card.classList.remove('active-schedule');
-  }
-
-  function renderChecklist() {
-    const now = new Date();
-    const dayOfWeek = now.getDay();
-    const isMandiDay = (dayOfWeek === 3 || dayOfWeek === 5);
-
-    const items = [
-      "Pengembunan Subuh (05:00)",
-      "EF Pagi - 9 Ekor Jangkrik (05:15)",
-      isMandiDay ? "💧 Mandi Pagi (Jadwal Rabu/Jumat)" : "Cek Air Minum Clean",
-      "Penjemuran Pagi (05:30)",
-      isMandiDay ? "Angin-anginkan (Bulu Kering)" : "Pengerodongan Pagi (06:00)",
-      "EF Sore - 9 Ekor Jangkrik (15:30)",
-      "Bersihkan Karpet Sangkar",
-      "Pengerodongan Malam",
-      "🥣 Kroto Segar (1x Seminggu)"
-    ];
-
-    const group = document.getElementById('checklistGroup');
-    group.innerHTML = '';
-    const savedStates = JSON.parse(localStorage.getItem('masterChecklistState') || '{}');
-
-    items.forEach((item, idx) => {
-      const isChecked = savedStates[idx] || false;
-      const label = document.createElement('label');
-      label.className = `check-item ${isChecked ? 'done' : ''}`;
-      label.innerHTML = `<input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleCheckItem(${idx}, this)"><span>${item}</span>`;
-      group.appendChild(label);
-    });
-  }
-
-  function toggleCheckItem(idx, checkbox) {
-    const savedStates = JSON.parse(localStorage.getItem('masterChecklistState') || '{}');
-    savedStates[idx] = checkbox.checked;
-    localStorage.setItem('masterChecklistState', JSON.stringify(savedStates));
-    checkbox.parentElement.classList.toggle('done', checkbox.checked);
-  }
-
-  function resetChecklist() {
-    localStorage.removeItem('masterChecklistState');
-    renderChecklist();
-  }
-
-  function switchTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-    event.currentTarget.classList.add('active');
-  }
-
-  function loadAudio() {
-    document.getElementById('masteranPlayer').src = document.getElementById('audioSelect').value;
-  }
-
-  function saveNote() {
-    const input = document.getElementById('noteInput');
-    const text = input.value.trim();
-    if (!text) return;
-
-    const notes = JSON.parse(localStorage.getItem('birdNotesMaster') || '[]');
-    const now = new Date();
-    const dateStr = `${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    
-    notes.unshift({ date: dateStr, text: text });
-    localStorage.setItem('birdNotesMaster', JSON.stringify(notes));
-    input.value = '';
-    renderNotes();
-  }
-
-  function renderNotes() {
-    const list = document.getElementById('logList');
-    const notes = JSON.parse(localStorage.getItem('birdNotesMaster') || '[]');
-    list.innerHTML = notes.length === 0 ? '<div style="font-size:0.8rem; color:var(--muted)">Belum ada catatan.</div>' : '';
-    notes.forEach(note => {
-      const item = document.createElement('div');
-      item.className = 'log-item';
-      item.innerHTML = `<div class="log-date">${note.date}</div><div>${note.text}</div>`;
-      list.appendChild(item);
-    });
   }
 
   function requestNotifPermission() {
@@ -573,39 +626,102 @@
       Notification.requestPermission().then(permission => {
         if (permission === "granted") {
           const btn = document.getElementById('btnNotif');
-          btn.innerText = "✅ Notifikasi Aktif";
+          btn.innerHTML = "<i class='fas fa-check'></i> Notif Aktif";
           btn.disabled = true;
-          sendNotif("Rawatan Burung Pro", "Notifikasi PWA Berhasil Diaktifkan!");
+          sendNotif("Rawatan Pro", "Notifikasi & Alarm Siap Bekerja!");
         }
       });
     }
   }
 
   function testAlarmAndVibrate() {
-    start1MinVibration();
+    startVibration();
     playAlarmChime();
-    sendNotif("📳 Tes Getar 1 Menit & Alarm", "Notifikasi & alarm berfungsi!");
+    sendNotif("Tes Alarm", "Ini adalah contoh notifikasi 5 menit sebelum jadwal!");
   }
 
-  function sendNotif(title, body) {
-    if ("Notification" in window && Notification.permission === "granted") {
-      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({ type: 'SHOW_NOTIF', title: title, body: body });
-      } else {
-        new Notification(title, { body: body, icon: 'https://cdn-icons-png.flaticon.com/512/3069/3069172.png' });
+  // ==========================================
+  // 7. JAM REALTIME & LOGIKA TIMELINE
+  // ==========================================
+  function updateClockAndSchedules() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    
+    const day = now.getDate();
+    const dayOfWeek = now.getDay();
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Ags", "Sep", "Okt", "Nov", "Des"];
+    const dayNames = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+
+    document.getElementById('clockDisplay').innerText = `${hours}:${minutes}:${seconds}`;
+    document.getElementById('dateDisplay').innerText = `${dayNames[dayOfWeek]}, ${day} ${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+
+    // Cek ganti hari jam 00:00:00 untuk reset otomatis walau web di-stay
+    if (hours === '00' && minutes === '00' && seconds === '00') { checkAndResetDailyData(); }
+
+    const isMandiDay = (dayOfWeek === 3 || dayOfWeek === 5);
+    const isVitDay = (dayOfWeek === 1 || dayOfWeek === 3 || dayOfWeek === 6);
+
+    const dayStatusEl = document.getElementById('dayStatus');
+    let statusText = `Fase: Reguler (${dayNames[dayOfWeek]})`;
+    if (isMandiDay) statusText += ` | 💧 Hari Mandi`;
+    if (isVitDay) statusText += ` | 🧪 Hari Vitacor`;
+    dayStatusEl.innerText = statusText;
+
+    const currentMins = now.getHours() * 60 + now.getMinutes();
+    
+    // FUNGSI HELPER: Cek dan set status timeline & notifikasi 5 menit sebelum
+    const checkSchedule = (cardId, startMin, endMin, notifFlag, notifTitle, notifBody) => {
+      const isActive = currentMins >= startMin && currentMins < endMin;
+      const card = document.getElementById(cardId);
+      if (isActive) card.classList.add('active-schedule');
+      else card.classList.remove('active-schedule');
+
+      // Pre-Notifikasi H-5 Menit (StartMin - 5)
+      if (currentMins === (startMin - 5) && !window[notifFlag]) {
+        sendNotif(`⏳ 5 Menit Lagi: ${notifTitle}`, notifBody);
+        playAlarmChime(); startVibration(); window[notifFlag] = true;
+      } 
+      else if (currentMins !== (startMin - 5)) {
+        window[notifFlag] = false; // Reset bendera agar besok bunyi lagi
       }
-    }
+    };
+
+    // 1. Embun (05:00 - 05:30) | Pre-notif: 04:55
+    checkSchedule('cardEmbun', 300, 330, 'preNotifEmbun', 'Pengembunan', 'Siap-siap keluarkan burung untuk embun subuh.');
+    
+    // 2. EF Pagi (05:30 - 06:00) | Pre-notif: 05:25
+    checkSchedule('cardEFPagi', 330, 360, 'preNotifEFPagi', 'EF Pagi', 'Siapkan jangkrik untuk makan pagi & bersihkan kandang.');
+    
+    // 3. Mandi/Krodong (06:00 - 15:30) | Pre-notif: 05:55
+    const actBody = isMandiDay ? 'Siapkan keramba/semprotan untuk mandi.' : 'Waktunya full krodong untuk istirahat siang.';
+    checkSchedule('cardMandiJemur', 360, 930, 'preNotifMandi', isMandiDay ? 'Sesi Mandi' : 'Pengerodongan', actBody);
+    
+    // 4. EF Sore (15:30 - 16:30) | Pre-notif: 15:25
+    checkSchedule('cardEFSore', 930, 990, 'preNotifEFSore', 'EF Sore', 'Siapkan jangkrik sore' + (isVitDay ? ' dan taburkan Vitacor.' : '.'));
   }
 
+  // ==========================================
+  // INITIALIZATION
+  // ==========================================
   window.onload = function() {
-    renderChecklist();
+    requestWakeLock(); // Langsung aktifkan layar agar tidak mati
+
+    const savedProfile = localStorage.getItem('selectedBirdProfile') || 'murai';
+    document.getElementById('birdTypeSelect').value = savedProfile;
+    
+    applyBirdPreset(savedProfile);
+    checkAndResetDailyData();
     renderNotes();
     loadAudio();
+
     if ("Notification" in window && Notification.permission === "granted") {
       const btn = document.getElementById('btnNotif');
-      btn.innerText = "✅ Notifikasi Aktif";
+      btn.innerHTML = "<i class='fas fa-check-double'></i> Notif Aktif";
       btn.disabled = true;
     }
+
     setInterval(updateClockAndSchedules, 1000);
     updateClockAndSchedules();
   };
