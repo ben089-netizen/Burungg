@@ -195,6 +195,35 @@
     .log-list { max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; }
     .log-item { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 10px; font-size: 0.85rem; border-left: 4px solid var(--primary); line-height: 1.4; }
     .log-date { font-weight: bold; color: var(--primary); font-size: 0.75rem; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+
+    /* Custom Confirm Modal */
+    #customConfirmModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      text-align: center;
+      max-width: 90%;
+      width: 320px;
+    }
+    .modal-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 5px;
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -322,6 +351,17 @@
     <div class="card">
       <div class="card-header" style="margin-bottom:15px;"><div class="card-title"><i class="fas fa-history"></i> Riwayat Aktivitas & Log</div></div>
       <div class="log-list" id="logList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Custom Confirmation Modal (Replaces browser confirm) -->
+<div id="customConfirmModal">
+  <div class="modal-content">
+    <p style="margin-bottom:20px; font-size:1.1rem;">Yakin ingin mereset semua checklist hari ini?</p>
+    <div>
+      <button onclick="executeReset()" class="modal-btn" style="background:var(--danger);">Ya, Reset</button>
+      <button onclick="closeConfirmModal()" class="modal-btn" style="background:var(--card-border);">Batal</button>
     </div>
   </div>
 </div>
@@ -459,12 +499,20 @@
   }
 
   function forceResetChecklist() {
-    if(confirm("Yakin ingin mereset semua checklist hari ini?")) {
-      const todayStr = new Date().toDateString();
-      const resetData = { date: todayStr, murai: {}, cendet: {} };
-      localStorage.setItem('birdChecklistData', JSON.stringify(resetData));
-      renderChecklist(resetData);
-    }
+    // Custom confirm popup to bypass block constraints
+    document.getElementById('customConfirmModal').style.display = 'flex';
+  }
+  
+  function closeConfirmModal() {
+    document.getElementById('customConfirmModal').style.display = 'none';
+  }
+  
+  function executeReset() {
+    closeConfirmModal();
+    const todayStr = new Date().toDateString();
+    const resetData = { date: todayStr, murai: {}, cendet: {} };
+    localStorage.setItem('birdChecklistData', JSON.stringify(resetData));
+    renderChecklist(resetData);
   }
 
   function renderChecklist(storedData) {
