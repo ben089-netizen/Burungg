@@ -1,8 +1,8 @@
 {
   "name": "Pengingat Rawatan Burung Pro",
   "short_name": "Burung Pro",
-  "start_url": "./pengingat_burung_master.html",
-  "scope": "/pengingat_burung_master/",
+  "start_url": "https://ben089-netizen.github.io/Burungg/index.html",
+  "scope": "/Burungg/",
   "display": "standalone",
   "background_color": "#121824",
   "theme_color": "#1b4332",
